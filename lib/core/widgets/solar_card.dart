@@ -33,8 +33,8 @@ class SolarCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: context.solarColors.cardShadow,
-              blurRadius: 24,
-              offset: Offset(0, 8),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
             ),
           ],
         ),

@@ -13,6 +13,10 @@ abstract final class AppTheme {
     onSecondary: AppColors.textOnDark,
     secondaryContainer: AppColors.navySoft,
     onSecondaryContainer: AppColors.deepNavy,
+    tertiary: AppColors.energyLime,
+    onTertiary: Color(0xFF173006),
+    tertiaryContainer: AppColors.energyLimeSoft,
+    onTertiaryContainer: Color(0xFF27420C),
     error: AppColors.error,
     onError: AppColors.textOnDark,
     errorContainer: AppColors.errorSoft,
@@ -20,11 +24,11 @@ abstract final class AppTheme {
     surface: AppColors.surface,
     onSurface: AppColors.textPrimary,
     surfaceContainerLowest: AppColors.surface,
-    surfaceContainerLow: Color(0xFFF9FAFC),
+    surfaceContainerLow: Color(0xFFFBF8F4),
     surfaceContainer: AppColors.surfaceMuted,
-    surfaceContainerHigh: Color(0xFFE8EDF3),
+    surfaceContainerHigh: Color(0xFFE9E2D8),
     onSurfaceVariant: AppColors.textSecondary,
-    outline: Color(0xFF8B97A8),
+    outline: Color(0xFF8C8378),
     outlineVariant: AppColors.border,
     shadow: Color(0x1A172033),
   );
@@ -38,6 +42,10 @@ abstract final class AppTheme {
     onSecondary: Color(0xFF243247),
     secondaryContainer: Color(0xFF2C3A50),
     onSecondaryContainer: Color(0xFFD9E4F4),
+    tertiary: AppColors.energyLimeDark,
+    onTertiary: Color(0xFF1C3308),
+    tertiaryContainer: Color(0xFF2C4518),
+    onTertiaryContainer: Color(0xFFD8F0B4),
     error: AppColors.darkError,
     onError: Color(0xFF690005),
     errorContainer: AppColors.darkErrorContainer,
@@ -45,11 +53,11 @@ abstract final class AppTheme {
     surface: AppColors.darkSurface,
     onSurface: AppColors.darkTextPrimary,
     surfaceContainerLowest: AppColors.darkCanvas,
-    surfaceContainerLow: Color(0xFF131E2F),
+    surfaceContainerLow: Color(0xFF171D2A),
     surfaceContainer: AppColors.darkSurfaceMuted,
-    surfaceContainerHigh: Color(0xFF28374D),
+    surfaceContainerHigh: Color(0xFF30384A),
     onSurfaceVariant: AppColors.darkTextSecondary,
-    outline: Color(0xFF8290A4),
+    outline: Color(0xFF8E877E),
     outlineVariant: AppColors.darkBorder,
     shadow: Color(0x99000000),
   );
@@ -246,6 +254,21 @@ abstract final class AppTheme {
         focusedBorder: _inputBorder(colorScheme.primary, width: 1.5),
         errorBorder: _inputBorder(colorScheme.error),
         focusedErrorBorder: _inputBorder(colorScheme.error, width: 1.5),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        height: 68,
+        backgroundColor: Colors.transparent,
+        indicatorColor: colorScheme.primaryContainer,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return TextStyle(
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            color: selected
+                ? colorScheme.onSurface
+                : colorScheme.onSurfaceVariant,
+          );
+        }),
       ),
       dividerTheme: DividerThemeData(
         color: colorScheme.outlineVariant,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:solar_ui/app/solar_app.dart';
 import 'package:solar_ui/app/theme_controller.dart';
+import 'package:solar_ui/core/branding/company_profile.dart';
+import 'package:solar_ui/core/widgets/company_logo.dart';
 import 'package:solar_ui/features/dashboard/presentation/dashboard_shell.dart';
 import 'package:solar_ui/features/startup/presentation/splash_screen.dart';
 
@@ -28,8 +30,8 @@ void main() {
     );
 
     expect(find.byType(SplashScreen), findsOneWidget);
-    expect(find.text('Solar'), findsOneWidget);
-    expect(find.text('Solar Service Management'), findsOneWidget);
+    expect(find.byType(CompanyLogo), findsOneWidget);
+    expect(find.text(CompanyProfile.productName), findsOneWidget);
     expect(find.text('Preparing your workspace'), findsOneWidget);
 
     await tester.pump(const Duration(milliseconds: 110));
@@ -47,6 +49,7 @@ void main() {
     await _pumpDashboard(tester, themeController, const Size(390, 844));
 
     expect(find.text('Quick access'), findsOneWidget);
+    expect(find.byType(CompanyLogo), findsWidgets);
     expect(find.text('Customers'), findsWidgets);
     expect(find.text('Sites & installations'), findsOneWidget);
     expect(find.text('Service requests'), findsOneWidget);
@@ -90,6 +93,21 @@ void main() {
     await tester.tap(find.text('Home'));
     await tester.pump();
     expect(find.text('Quick access'), findsOneWidget);
+  });
+
+  testWidgets('more shows the approved company identity', (
+    WidgetTester tester,
+  ) async {
+    await _pumpDashboard(tester, themeController, const Size(390, 844));
+
+    await tester.tap(find.text('More'));
+    await tester.pumpAndSettle();
+
+    expect(find.text(CompanyProfile.legalName), findsOneWidget);
+    expect(find.text(CompanyProfile.gstin), findsOneWidget);
+    expect(find.textContaining('Satara - 415002'), findsOneWidget);
+    expect(find.textContaining('not connected'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('theme selector applies and persists all appearance modes', (

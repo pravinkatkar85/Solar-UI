@@ -36,11 +36,11 @@ class SolarThemeColors extends ThemeExtension<SolarThemeColors> {
   final Color infoContainer;
 
   static const light = SolarThemeColors(
-    heroStart: Color(0xFF172235),
-    heroEnd: Color(0xFF233550),
-    heroSurface: Color(0xFF2B3E5B),
+    heroStart: Color(0xFF172033),
+    heroEnd: Color(0xFF273B92),
+    heroSurface: Color(0xFF1E3358),
     onHero: Color(0xFFF8FAFC),
-    cardShadow: Color(0x12172033),
+    cardShadow: Color(0x0C1B2430),
     success: Color(0xFF16794B),
     onSuccessContainer: Color(0xFF0B5734),
     successContainer: Color(0xFFE2F5EB),
@@ -53,9 +53,9 @@ class SolarThemeColors extends ThemeExtension<SolarThemeColors> {
   );
 
   static const dark = SolarThemeColors(
-    heroStart: Color(0xFF19263A),
-    heroEnd: Color(0xFF263B59),
-    heroSurface: Color(0xFF304765),
+    heroStart: Color(0xFF141C28),
+    heroEnd: Color(0xFF24345A),
+    heroSurface: Color(0xFF1B2944),
     onHero: Color(0xFFF8FAFC),
     cardShadow: Color(0x52040A12),
     success: Color(0xFF5DD39E),

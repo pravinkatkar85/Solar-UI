@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:solar_ui/app/theme_controller.dart';
+import 'package:solar_ui/core/api/api_base_url.dart';
+import 'package:solar_ui/core/api/dropdown_cache.dart';
+import 'package:solar_ui/core/api/dropdown_client.dart';
+import 'package:solar_ui/core/api/dropdown_exceptions.dart';
+import 'package:solar_ui/core/api/dropdown_repository.dart';
 import 'package:solar_ui/core/demo/demo_user.dart';
 import 'package:solar_ui/core/theme/app_layout.dart';
-import 'package:solar_ui/core/widgets/theme_selector.dart';
+import 'package:solar_ui/features/address/presentation/address_selection_screen.dart';
+import 'package:solar_ui/features/company/presentation/company_about_screen.dart';
 import 'package:solar_ui/features/dashboard/presentation/dashboard_home.dart';
 
 class DashboardShell extends StatefulWidget {
@@ -22,6 +28,40 @@ class DashboardShell extends StatefulWidget {
 
 class _DashboardShellState extends State<DashboardShell> {
   int _selectedIndex = 0;
+  HttpDropdownClient? _dropdownClient;
+  DropdownRepository? _addressRepository;
+  String? _addressSetupMessage;
+
+  @override
+  void dispose() {
+    _dropdownClient?.close();
+    super.dispose();
+  }
+
+  void _openAddress() {
+    if (_addressRepository != null || _addressSetupMessage != null) return;
+    try {
+      final client = HttpDropdownClient();
+      _dropdownClient = client;
+      _addressRepository = DropdownRepository(
+        baseUrl: ApiBaseUrl.fromEnvironment(),
+        transport: client,
+        cache: SharedPreferencesDropdownCacheStore(),
+      );
+    } on InvalidApiBaseUrlException catch (error) {
+      _addressSetupMessage = error.message;
+    }
+  }
+
+  Widget _customersPage() {
+    final message = _addressSetupMessage;
+    if (message != null) {
+      return _AddressSetupNotice(message: message);
+    }
+    final repository = _addressRepository;
+    if (repository == null) return const SizedBox.shrink();
+    return AddressSelectionScreen(repository: repository);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +70,7 @@ class _DashboardShellState extends State<DashboardShell> {
 
     final destinations = [
       DashboardHome(user: widget.user, themeController: widget.themeController),
-      const _ComingSoonDestination(
-        icon: Icons.people_alt_outlined,
-        title: 'Customers',
-        description:
-            'Customer profiles and onboarding will be implemented after the '
-            'approved database and API contracts are available.',
-      ),
+      _customersPage(),
       const _ComingSoonDestination(
         icon: Icons.home_repair_service_outlined,
         title: 'Services',
@@ -44,10 +78,8 @@ class _DashboardShellState extends State<DashboardShell> {
             'Service requests, complaints, visits and assignments will be '
             'introduced in later feature phases.',
       ),
-      _ComingSoonDestination(
-        icon: Icons.more_horiz_rounded,
-        title: 'More',
-        description: 'Profile, preferences and additional tools are not implemented yet.',
+      CompanyAboutScreen(
+        user: widget.user,
         themeController: widget.themeController,
       ),
     ];
@@ -70,6 +102,7 @@ class _DashboardShellState extends State<DashboardShell> {
           selectedIndex: _selectedIndex,
           onDestinationSelected: (index) {
             if (_selectedIndex == index) return;
+            if (index == 1) _openAddress();
             setState(() => _selectedIndex = index);
           },
         ),
@@ -94,7 +127,11 @@ class _DashboardNavigationBar extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.7),
+          ),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -138,18 +175,50 @@ class _DashboardNavigationBar extends StatelessWidget {
   }
 }
 
+class _AddressSetupNotice extends StatelessWidget {
+  const _AddressSetupNotice({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: Column(
+            children: [
+              const SizedBox(height: AppSpacing.xxl),
+              Text(
+                'Address selection is unavailable',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ComingSoonDestination extends StatelessWidget {
   const _ComingSoonDestination({
     required this.icon,
     required this.title,
     required this.description,
-    this.themeController,
   });
 
   final IconData icon;
   final String title;
   final String description;
-  final ThemeController? themeController;
 
   @override
   Widget build(BuildContext context) {
@@ -196,15 +265,6 @@ class _ComingSoonDestination extends StatelessWidget {
                 style: Theme.of(context).textTheme.labelMedium
                     ?.copyWith(color: colorScheme.primary),
               ),
-              if (themeController != null) ...[
-                const SizedBox(height: AppSpacing.xl),
-                Text(
-                  'Appearance',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                SolarThemeSelector(controller: themeController!),
-              ],
             ],
           ),
         ),

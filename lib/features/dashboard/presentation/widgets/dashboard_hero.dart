@@ -16,21 +16,19 @@ class DashboardHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final colors = context.solarColors;
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [colors.heroStart, colors.heroEnd],
-        ),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(AppRadii.large),
+        border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
             color: colors.cardShadow,
-            blurRadius: 34,
-            offset: const Offset(0, 14),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -50,8 +48,8 @@ class DashboardHero extends StatelessWidget {
                         onOpenWorkspace: onOpenWorkspace,
                         compact: true,
                       ),
-                      const SizedBox(height: AppSpacing.lg),
-                      const _DashboardArtwork(),
+                      const SizedBox(height: AppSpacing.md),
+                      const _DashboardArtwork(compact: true),
                     ],
                   )
                 : Row(
@@ -88,7 +86,7 @@ class _HeroContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onHero = context.solarColors.onHero;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,26 +95,23 @@ class _HeroContent extends StatelessWidget {
         Text(
           'WELCOME, ${user.firstName.toUpperCase()}',
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: Theme.of(context).colorScheme.primary,
-            letterSpacing: 1.4,
-            fontWeight: FontWeight.w800,
+            color: colorScheme.primary,
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
           'Your solar service\nworkspace, in one place.',
-          style:
-              (compact
-                      ? Theme.of(context).textTheme.headlineMedium
-                      : Theme.of(context).textTheme.displaySmall)
-                  ?.copyWith(color: onHero),
+          style: compact
+              ? Theme.of(context).textTheme.headlineMedium
+              : Theme.of(context).textTheme.displaySmall,
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
           'Keep customer care, site work and service operations clear and '
           'connected as each feature becomes available.',
-          style: Theme.of(context).textTheme.bodyLarge
-              ?.copyWith(color: onHero.withValues(alpha: 0.76)),
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: AppSpacing.lg),
         SolarPrimaryButton(
@@ -131,30 +126,31 @@ class _HeroContent extends StatelessWidget {
 }
 
 class _DashboardArtwork extends StatelessWidget {
-  const _DashboardArtwork();
+  const _DashboardArtwork({this.compact = false});
+
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.solarColors;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Semantics(
       label: 'Solar panel and connected service illustration',
       image: true,
       child: AspectRatio(
-        aspectRatio: 1.45,
+        aspectRatio: compact ? 2.8 : 1.45,
         child: Container(
           decoration: BoxDecoration(
-            color: colors.heroSurface.withValues(alpha: 0.78),
-            borderRadius: BorderRadius.circular(AppRadii.large),
-            border: Border.all(color: colors.onHero.withValues(alpha: 0.12)),
+            color: colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(AppRadii.medium),
           ),
           clipBehavior: Clip.antiAlias,
           child: CustomPaint(
             painter: _DashboardArtworkPainter(
               accent: colorScheme.primary,
-              foreground: colors.onHero,
-              panel: const Color(0xFF31547E),
+              foreground: colorScheme.onSecondary,
+              panel: colorScheme.secondary,
+              energy: colorScheme.tertiary,
             ),
           ),
         ),
@@ -168,16 +164,19 @@ class _DashboardArtworkPainter extends CustomPainter {
     required this.accent,
     required this.foreground,
     required this.panel,
+    required this.energy,
   });
 
   final Color accent;
   final Color foreground;
   final Color panel;
+  final Color energy;
 
   @override
   void paint(Canvas canvas, Size size) {
     final sun = Offset(size.width * 0.78, size.height * 0.24);
     canvas.drawCircle(sun, size.shortestSide * 0.11, Paint()..color = accent);
+    canvas.drawCircle(sun, size.shortestSide * 0.045, Paint()..color = energy);
     canvas.drawCircle(
       sun,
       size.shortestSide * 0.18,
@@ -261,6 +260,7 @@ class _DashboardArtworkPainter extends CustomPainter {
   bool shouldRepaint(covariant _DashboardArtworkPainter oldDelegate) {
     return accent != oldDelegate.accent ||
         foreground != oldDelegate.foreground ||
-        panel != oldDelegate.panel;
+        panel != oldDelegate.panel ||
+        energy != oldDelegate.energy;
   }
 }

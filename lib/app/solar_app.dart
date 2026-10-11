@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:solar_ui/app/theme_controller.dart';
+import 'package:solar_ui/core/branding/company_profile.dart';
 import 'package:solar_ui/core/demo/demo_user.dart';
 import 'package:solar_ui/core/theme/app_theme.dart';
 import 'package:solar_ui/features/dashboard/presentation/dashboard_shell.dart';
@@ -11,7 +12,7 @@ import 'package:solar_ui/features/startup/presentation/splash_screen.dart';
 class SolarApp extends StatelessWidget {
   const SolarApp({
     required this.themeController,
-    this.startupDuration = const Duration(milliseconds: 1900),
+    this.startupDuration = const Duration(seconds: 5),
     super.key,
   });
 
@@ -24,7 +25,7 @@ class SolarApp extends StatelessWidget {
       animation: themeController,
       builder: (context, _) {
         return MaterialApp(
-          title: 'Solar',
+          title: CompanyProfile.productName,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,

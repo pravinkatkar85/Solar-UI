@@ -21,11 +21,11 @@ class QuickActionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 46,
-            height: 46,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
               color: colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(AppRadii.medium),
+              borderRadius: BorderRadius.circular(AppRadii.small),
             ),
             alignment: Alignment.center,
             child: Icon(

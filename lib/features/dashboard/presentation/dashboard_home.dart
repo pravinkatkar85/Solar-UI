@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:solar_ui/app/theme_controller.dart';
 import 'package:solar_ui/core/demo/demo_user.dart';
 import 'package:solar_ui/core/theme/app_layout.dart';
+import 'package:solar_ui/core/widgets/company_logo.dart';
 import 'package:solar_ui/core/widgets/solar_feedback.dart';
 import 'package:solar_ui/core/widgets/theme_selector.dart';
 import 'package:solar_ui/features/dashboard/models/dashboard_module.dart';
@@ -55,7 +56,7 @@ class DashboardHome extends StatelessWidget {
                     currentDate: currentDate,
                     themeController: themeController,
                   ),
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.lg),
                   DashboardHero(
                     user: user,
                     onOpenWorkspace: () => showComingSoonSheet(
@@ -66,20 +67,20 @@ class DashboardHome extends StatelessWidget {
                           'request, visit and assignment contracts are approved.',
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xl),
                   const DashboardSectionHeader(
                     title: 'Quick access',
                     description: 'BRD-aligned modules prepared for future implementation.',
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacing.md),
                   const _QuickActionGrid(),
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xl),
                   const DashboardSectionHeader(
                     title: 'My workspace',
                     description:
                         'Live operational information will appear here later.',
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacing.md),
                   const EmptyWorkspaceCard(),
                 ],
               ),
@@ -110,31 +111,27 @@ class _DashboardHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${_greeting(currentDate.hour)}, ${user.firstName}',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  const SizedBox(height: AppSpacing.xxs),
-                  Text(
-                    user.role,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
+            const Flexible(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: CompanyLogo(height: 28),
+                ),
               ),
             ),
-            const SizedBox(width: AppSpacing.xs),
+            const SizedBox(width: AppSpacing.sm),
             SolarThemeSelector(controller: themeController, showLabel: false),
             const SizedBox(width: AppSpacing.xs),
             IconButton(
               tooltip: 'Notifications — not implemented yet',
+              style: IconButton.styleFrom(
+                backgroundColor: colorScheme.surface,
+                foregroundColor: colorScheme.onSurface,
+                side: BorderSide(color: colorScheme.outlineVariant),
+              ),
               onPressed: () => showComingSoonSheet(
                 context,
                 title: 'Notifications are coming soon',
@@ -144,40 +141,35 @@ class _DashboardHeader extends StatelessWidget {
               ),
               icon: const Icon(Icons.notifications_none_rounded),
             ),
-            const SizedBox(width: AppSpacing.xs),
-            Semantics(
-              label: '${user.displayName}, ${user.role}, development demo user',
-              image: true,
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: colorScheme.secondary,
-                foregroundColor: colorScheme.onSecondary,
-                child: Text(
-                  user.initials,
-                  style: Theme.of(context).textTheme.labelLarge
-                      ?.copyWith(color: colorScheme.onSecondary),
-                ),
-              ),
-            ),
           ],
         ),
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          _greeting(currentDate.hour),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        Text(
+          user.firstName,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: AppSpacing.xs),
         Wrap(
           spacing: AppSpacing.sm,
           runSpacing: AppSpacing.xs,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Text('Dashboard', style: Theme.of(context).textTheme.titleLarge),
-            SolarStatusIndicator(
+            Text(user.role, style: Theme.of(context).textTheme.bodyMedium),
+            const SolarStatusIndicator(
               label: 'Demo mode',
               tone: SolarStatusTone.info,
             ),
+            Text(
+              _formattedDate(currentDate),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ],
-        ),
-        const SizedBox(height: AppSpacing.xxs),
-        Text(
-          _formattedDate(currentDate),
-          style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
     );
