@@ -9,6 +9,9 @@ class DemoUser {
     required this.isDevelopmentOnly,
   });
 
+  const DemoUser.signedIn({required String displayName, required String role})
+    : this(displayName: displayName, role: role, isDevelopmentOnly: false);
+
   final String displayName;
   final String role;
   final bool isDevelopmentOnly;

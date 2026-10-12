@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solar_ui/app/solar_app.dart';
 import 'package:solar_ui/app/theme_controller.dart';
 import 'package:solar_ui/core/branding/company_profile.dart';
+import 'package:solar_ui/core/demo/demo_user.dart';
+import 'package:solar_ui/core/theme/app_theme.dart';
 import 'package:solar_ui/core/widgets/company_logo.dart';
 import 'package:solar_ui/features/dashboard/presentation/dashboard_shell.dart';
 import 'package:solar_ui/features/startup/presentation/splash_screen.dart';
@@ -23,9 +24,15 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(
-      SolarApp(
-        themeController: themeController,
-        startupDuration: const Duration(milliseconds: 100),
+      MaterialApp(
+        theme: AppTheme.lightTheme,
+        home: SplashScreen(
+          startupDuration: const Duration(milliseconds: 100),
+          destinationBuilder: (context) => DashboardShell(
+            user: DemoUsers.current,
+            themeController: themeController,
+          ),
+        ),
       ),
     );
 
@@ -176,7 +183,20 @@ Future<void> _pumpDashboard(
   addTearDown(() => tester.binding.setSurfaceSize(null));
 
   await tester.pumpWidget(
-    SolarApp(themeController: themeController, startupDuration: Duration.zero),
+    AnimatedBuilder(
+      animation: themeController,
+      builder: (context, _) {
+        return MaterialApp(
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeController.themeMode,
+          home: DashboardShell(
+            user: DemoUsers.current,
+            themeController: themeController,
+          ),
+        );
+      },
+    ),
   );
   await tester.pump();
   await tester.pumpAndSettle();

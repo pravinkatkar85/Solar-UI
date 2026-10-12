@@ -11,6 +11,8 @@ class SolarTextField extends StatelessWidget {
     this.prefixIcon,
     this.onChanged,
     this.enabled = true,
+    this.obscureText = false,
+    this.maxLength,
     super.key,
   });
 
@@ -22,6 +24,8 @@ class SolarTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final ValueChanged<String>? onChanged;
   final bool enabled;
+  final bool obscureText;
+  final int? maxLength;
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +34,13 @@ class SolarTextField extends StatelessWidget {
       keyboardType: keyboardType,
       onChanged: onChanged,
       enabled: enabled,
+      obscureText: obscureText,
+      maxLength: maxLength,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         helperText: helperText,
+        counterText: maxLength == null ? null : '',
         prefixIcon: prefixIcon == null
             ? null
             : Icon(prefixIcon, size: AppSizes.iconMedium),
