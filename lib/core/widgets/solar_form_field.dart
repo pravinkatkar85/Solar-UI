@@ -13,6 +13,7 @@ class SolarTextField extends StatelessWidget {
     this.enabled = true,
     this.obscureText = false,
     this.maxLength,
+    this.suffixIcon,
     super.key,
   });
 
@@ -26,6 +27,7 @@ class SolarTextField extends StatelessWidget {
   final bool enabled;
   final bool obscureText;
   final int? maxLength;
+  final Widget? suffixIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +46,7 @@ class SolarTextField extends StatelessWidget {
         prefixIcon: prefixIcon == null
             ? null
             : Icon(prefixIcon, size: AppSizes.iconMedium),
+        suffixIcon: suffixIcon,
       ),
     );
   }

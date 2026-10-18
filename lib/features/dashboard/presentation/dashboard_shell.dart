@@ -9,6 +9,11 @@ import 'package:solar_ui/core/api/dropdown_repository.dart';
 import 'package:solar_ui/core/demo/demo_user.dart';
 import 'package:solar_ui/core/theme/app_layout.dart';
 import 'package:solar_ui/features/address/presentation/address_selection_screen.dart';
+import 'package:solar_ui/features/auth/auth_api.dart';
+import 'package:solar_ui/features/auth/presentation/change_pin_screen.dart';
+import 'package:solar_ui/features/catalogue/catalogue_api.dart';
+import 'package:solar_ui/features/catalogue/presentation/catalogue_screen.dart';
+import 'package:solar_ui/features/catalogue/presentation/enquiry_list_screen.dart';
 import 'package:solar_ui/features/company/presentation/company_about_screen.dart';
 import 'package:solar_ui/features/dashboard/presentation/dashboard_home.dart';
 
@@ -16,11 +21,21 @@ class DashboardShell extends StatefulWidget {
   const DashboardShell({
     required this.user,
     required this.themeController,
+    this.authApi,
+    this.catalogueApi,
+    this.accessToken,
+    this.onSignIn,
+    this.onSignOut,
     super.key,
   });
 
   final DemoUser user;
   final ThemeController themeController;
+  final AuthApi? authApi;
+  final CatalogueApi? catalogueApi;
+  final String? accessToken;
+  final Future<void> Function()? onSignIn;
+  final Future<void> Function()? onSignOut;
 
   @override
   State<DashboardShell> createState() => _DashboardShellState();
@@ -38,6 +53,25 @@ class _DashboardShellState extends State<DashboardShell> {
     super.dispose();
   }
 
+  bool get _canChangePin {
+    final token = widget.accessToken?.trim() ?? '';
+    return widget.authApi != null && token.isNotEmpty;
+  }
+
+  void _openChangePin() {
+    final authApi = widget.authApi;
+    final accessToken = widget.accessToken;
+    if (authApi == null || accessToken == null || accessToken.trim().isEmpty) {
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) =>
+            ChangePinScreen(authApi: authApi, accessToken: accessToken),
+      ),
+    );
+  }
+
   void _openAddress() {
     if (_addressRepository != null || _addressSetupMessage != null) return;
     try {
@@ -51,6 +85,34 @@ class _DashboardShellState extends State<DashboardShell> {
     } on InvalidApiBaseUrlException catch (error) {
       _addressSetupMessage = error.message;
     }
+  }
+
+  void _openEnquiries() {
+    final catalogueApi = widget.catalogueApi;
+    final token = widget.accessToken;
+    if (catalogueApi == null || token == null || token.trim().isEmpty) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) =>
+            EnquiryListScreen(catalogueApi: catalogueApi, accessToken: token),
+      ),
+    );
+  }
+
+  void _openCatalogue() {
+    final catalogueApi = widget.catalogueApi;
+    if (catalogueApi == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => CatalogueScreen(
+          catalogueApi: catalogueApi,
+          accessToken: widget.accessToken,
+          mediaBaseUrl: catalogueApi.mediaBaseUrl,
+          onRequestSignIn: widget.onSignIn,
+          showAll: true,
+        ),
+      ),
+    );
   }
 
   Widget _customersPage() {
@@ -69,7 +131,21 @@ class _DashboardShellState extends State<DashboardShell> {
     final isDark = theme.brightness == Brightness.dark;
 
     final destinations = [
-      DashboardHome(user: widget.user, themeController: widget.themeController),
+      DashboardHome(
+        user: widget.user,
+        themeController: widget.themeController,
+        catalogueApi: widget.catalogueApi,
+        accessToken: widget.accessToken,
+        onSignIn: widget.onSignIn,
+        onOpenCatalogue: widget.catalogueApi == null ? null : _openCatalogue,
+        onChangePin: _canChangePin ? _openChangePin : null,
+        onViewEnquiries: _canChangePin ? _openEnquiries : null,
+        onOpenAddress: () {
+          _openAddress();
+          setState(() => _selectedIndex = 1);
+        },
+        onSignOut: widget.onSignOut,
+      ),
       _customersPage(),
       const _ComingSoonDestination(
         icon: Icons.home_repair_service_outlined,
@@ -81,6 +157,7 @@ class _DashboardShellState extends State<DashboardShell> {
       CompanyAboutScreen(
         user: widget.user,
         themeController: widget.themeController,
+        onChangePin: _canChangePin ? _openChangePin : null,
       ),
     ];
 

@@ -12,23 +12,29 @@ import 'package:solar_ui/core/widgets/solar_card.dart';
 import 'package:solar_ui/core/widgets/solar_feedback.dart';
 import 'package:solar_ui/core/widgets/solar_form_field.dart';
 import 'package:solar_ui/features/auth/auth_api.dart';
+import 'package:solar_ui/features/catalogue/catalogue_api.dart';
 import 'package:solar_ui/features/dashboard/presentation/dashboard_shell.dart';
 import 'package:solar_ui/features/startup/presentation/splash_screen.dart';
 
-/// Mobile number and PIN gate. The dashboard opens only after a successful login.
+/// Mobile number and PIN gate. A successful login opens the dashboard,
+/// or returns the signed-in user when the caller supplied [onSignedIn].
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
     required this.authApi,
     required this.countries,
     required this.themeController,
+    this.catalogueApi,
     this.postLoginDelay = const Duration(seconds: 6),
+    this.onSignedIn,
     super.key,
   });
 
   final AuthApi authApi;
   final DropdownRepository countries;
   final ThemeController themeController;
+  final CatalogueApi? catalogueApi;
   final Duration postLoginDelay;
+  final ValueChanged<SignedInUser>? onSignedIn;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -163,6 +169,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _openDashboard(SignedInUser user) {
+    final handoff = widget.onSignedIn;
+    if (handoff != null) {
+      handoff(user);
+      return;
+    }
     Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
         builder: (context) => SplashScreen(
@@ -173,6 +184,9 @@ class _LoginScreenState extends State<LoginScreen> {
               role: user.roleName,
             ),
             themeController: widget.themeController,
+            authApi: widget.authApi,
+            catalogueApi: widget.catalogueApi,
+            accessToken: user.accessToken,
           ),
         ),
       ),

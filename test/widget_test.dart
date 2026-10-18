@@ -47,7 +47,22 @@ void main() {
     expect(find.byType(SplashScreen), findsNothing);
     expect(find.byType(DashboardShell), findsOneWidget);
     expect(find.textContaining('Rahul'), findsOneWidget);
-    expect(find.text('Demo mode'), findsOneWidget);
+    expect(find.text('Welcome, Rahul'), findsOneWidget);
+    expect(find.text('Demo mode'), findsNothing);
+  });
+
+  testWidgets('a guest profile menu offers only sign in', (
+    WidgetTester tester,
+  ) async {
+    await _pumpDashboard(tester, themeController, const Size(390, 844));
+
+    await tester.tap(find.byKey(const Key('profile-menu')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('My Account'), findsNothing);
+    expect(find.text('Change PIN'), findsNothing);
+    expect(find.text('View enquiries'), findsNothing);
+    expect(find.byKey(const Key('profile-sign-in')), findsOneWidget);
   });
 
   testWidgets('dashboard renders BRD modules at compact width', (

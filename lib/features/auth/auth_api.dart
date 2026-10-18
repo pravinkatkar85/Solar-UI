@@ -43,6 +43,13 @@ abstract interface class AuthApi {
     required String pin,
   });
 
+  Future<AuthResult> changePin({
+    required String accessToken,
+    required String oldPin,
+    required String newPin,
+    required String confirmPin,
+  });
+
   void close();
 }
 
@@ -81,6 +88,46 @@ class HttpAuthApi implements AuthApi {
     }, expectUser: true);
   }
 
+  @override
+  Future<AuthResult> changePin({
+    required String accessToken,
+    required String oldPin,
+    required String newPin,
+    required String confirmPin,
+  }) async {
+    if (accessToken.trim().isEmpty) {
+      return const AuthResult.failure('Sign in again to change your PIN.');
+    }
+    try {
+      final response = await _client
+          .post(
+            _baseUrl.value.resolve(
+              '${_baseUrl.value.path}/api/auth/change-pin',
+            ),
+            headers: {
+              'accept': 'application/json',
+              'content-type': 'application/json; charset=utf-8',
+              'authorization': 'Bearer $accessToken',
+            },
+            body: jsonEncode({
+              'old_pin': oldPin,
+              'new_pin': newPin,
+              'confirm_pin': confirmPin,
+            }),
+          )
+          .timeout(HttpDropdownClient.defaultTimeout);
+      return _read(
+        response.body,
+        expectUser: false,
+        failureMessage: 'PIN could not be updated.',
+      );
+    } on TimeoutException {
+      return const AuthResult.failure('The request timed out. Try again.');
+    } on Object {
+      return const AuthResult.failure('PIN could not be updated.');
+    }
+  }
+
   Future<AuthResult> _post(
     String path,
     Map<String, String> body, {
@@ -105,20 +152,24 @@ class HttpAuthApi implements AuthApi {
     }
   }
 
-  AuthResult _read(String body, {required bool expectUser}) {
+  AuthResult _read(
+    String body, {
+    required bool expectUser,
+    String failureMessage = 'Sign-in could not be completed.',
+  }) {
     final Object? decoded;
     try {
       decoded = jsonDecode(body);
     } on FormatException {
-      return const AuthResult.failure('Sign-in could not be completed.');
+      return AuthResult.failure(failureMessage);
     }
     if (decoded is! Map) {
-      return const AuthResult.failure('Sign-in could not be completed.');
+      return AuthResult.failure(failureMessage);
     }
     final status = decoded['status'];
     final message = decoded['message'];
     if (message is! String || message.isEmpty) {
-      return const AuthResult.failure('Sign-in could not be completed.');
+      return AuthResult.failure(failureMessage);
     }
     if (status != 'SUCCESS') {
       return AuthResult.failure(message);
@@ -141,7 +192,7 @@ class HttpAuthApi implements AuthApi {
         roleName.trim().isEmpty ||
         accessToken is! String ||
         accessToken.isEmpty) {
-      return const AuthResult.failure('Sign-in could not be completed.');
+      return AuthResult.failure(failureMessage);
     }
     return AuthResult.success(
       message: message,

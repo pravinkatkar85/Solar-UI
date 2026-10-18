@@ -93,7 +93,7 @@ class _HeroContent extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'WELCOME, ${user.firstName.toUpperCase()}',
+          'Welcome, ${user.firstName}',
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
             color: colorScheme.primary,
             letterSpacing: 1.2,

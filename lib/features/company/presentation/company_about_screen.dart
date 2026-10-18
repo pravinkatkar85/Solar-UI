@@ -4,6 +4,7 @@ import 'package:solar_ui/core/branding/company_profile.dart';
 import 'package:solar_ui/core/demo/demo_user.dart';
 import 'package:solar_ui/core/theme/app_layout.dart';
 import 'package:solar_ui/core/widgets/company_logo.dart';
+import 'package:solar_ui/core/widgets/solar_buttons.dart';
 import 'package:solar_ui/core/widgets/solar_card.dart';
 import 'package:solar_ui/core/widgets/theme_selector.dart';
 
@@ -12,11 +13,13 @@ class CompanyAboutScreen extends StatelessWidget {
   const CompanyAboutScreen({
     required this.user,
     required this.themeController,
+    this.onChangePin,
     super.key,
   });
 
   final DemoUser user;
   final ThemeController themeController;
+  final VoidCallback? onChangePin;
 
   @override
   Widget build(BuildContext context) {
@@ -108,10 +111,18 @@ class CompanyAboutScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               SolarThemeSelector(controller: themeController),
               const SizedBox(height: AppSpacing.md),
-              Text(
-                'Authentication and business operations are not connected.',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+              if (onChangePin != null)
+                SolarSecondaryButton(
+                  key: const Key('open-change-pin'),
+                  label: 'Change PIN',
+                  expand: true,
+                  onPressed: onChangePin,
+                )
+              else
+                Text(
+                  'Authentication and business operations are not connected.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
             ],
           ),
         ),

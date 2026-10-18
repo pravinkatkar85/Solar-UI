@@ -66,7 +66,7 @@ void main() {
 
     expect(find.byType(DashboardShell), findsOneWidget);
     expect(find.textContaining('Asha'), findsWidgets);
-    expect(find.text('End Customer'), findsOneWidget);
+    expect(find.text('End Customer'), findsNothing);
     expect(find.textContaining('Rahul'), findsNothing);
   });
 
@@ -182,6 +182,16 @@ class _FakeAuthApi implements AuthApi {
 
   @override
   void close() {}
+
+  @override
+  Future<AuthResult> changePin({
+    required String accessToken,
+    required String oldPin,
+    required String newPin,
+    required String confirmPin,
+  }) async {
+    return const AuthResult.failure('PIN could not be updated.');
+  }
 }
 
 class _MemoryThemeStore implements ThemePreferenceStore {

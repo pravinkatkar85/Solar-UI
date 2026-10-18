@@ -4,7 +4,7 @@ import 'package:solar_ui/core/theme/app_layout.dart';
 class DashboardSectionHeader extends StatelessWidget {
   const DashboardSectionHeader({
     required this.title,
-    required this.description,
+    this.description = '',
     super.key,
   });
 
@@ -17,8 +17,10 @@ class DashboardSectionHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title, style: Theme.of(context).textTheme.titleLarge),
-        const SizedBox(height: AppSpacing.xxs),
-        Text(description, style: Theme.of(context).textTheme.bodyMedium),
+        if (description.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.xxs),
+          Text(description, style: Theme.of(context).textTheme.bodyMedium),
+        ],
       ],
     );
   }
